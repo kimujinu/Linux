@@ -109,7 +109,53 @@
 -> mkswap file-name : 스왑 파일 생성\
 -> swapon [option] {partition | file-name} : 스왑 영역 활성화\
 -> swapoff [option] {partition | file-name | UUID } : 스왑 영역 활성화 해제
-
+# 6. 논리볼륨 관리
+-> 전통적인 디스크 파티셔닝은 장치의 설정이나 사이즈를 변경하는 작업이 어렵기 때문에 확장성이나 유연성 확보를 위한 작업\
+-> 논리 볼륨 구성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 디스크 장치 - 물리 볼륨 - 볼륨 그룹 - 논리 볼륨\
+-> 논리 볼륨 생성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 물리볼륨을 생성하기 위한 파티션 생성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fdisk -l /dev/sdb \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lvmdiskscan : 파티션정보 확인 \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 물리 볼륨 생성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pcvreate partition1 partition2...\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 볼륨 그룹 구성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgcreate [option] volume-group-name physical-volume1 2...\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgremove volume-group-name : 볼륨그룹 삭제 \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 논리 볼륨 생성\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lvcreate [option] volume-group-name\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lvremove logical-volume-path : 논리 볼륨 삭제\
+-> 스트라이프 볼륨(Striped Volume)\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 스토리지의 사이즈와 성능을 중시하는 논리 볼륨 생성 방식\
+-> 미러 볼륨\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 서비스 이상시 서비스가 중단되지 않고 정상적으로 서비스를 제공하며 데이터 손실을 방지하도록 하며 \
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;이러한 내결함성을 중시한 논리 볼륨 방식\
+-> RAID-5, RAID-6 볼륨\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 스트라이프 볼륨의 사이즈의 효율성으로 성능을 향상 시킬수 있고, 미러 볼륨만큼은 아니지만, 내결함성을 지원한다.\
+-> RAID-10 볼륨\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> RAID-1 볼륨인 미러 볼륨을 먼저 구성하고, 생성된 미러 볼륨을 RAID-0 볼륨, 스트라이프 볼륨으로 연결하는 방식을 의미\
+### 씬 프로비저닝 구성
+-> 볼륨의 크기를 실제 디스크에 할당되는 크기가 아닌 가상의 크기를 사용하는 방식\
+-> 씬 프로비저닝을 사용하여 논리 볼륨을 생성하면 볼륨 그룹에서 지정한 사이즈 전체를 바로 할당받지 않고,\
+&nbsp;&nbsp;&nbsp;&nbsp;실제로 사용할 크기만큼만 사이즈를 할당받아 사용하다가 임계치에 도달하면 다시 볼륨의 사이즈를 증가시킨다.\
+### 논리 볼륨 관련 명령어
+-> pvdisplay : 물리 볼륨 상태 확인\
+-> vgdisplay : 볼륨 그룹 상태 확인\
+-> lvdisplay : 논리 볼륨 상태 확인\
+\
+-> 볼륨 그룹 확장\
+&nbsp;&nbsp;&nbsp;&nbsp;-> vgextend volume-group-name physical-volume1 2...\
+-> 볼륨 그룹 축소\
+&nbsp;&nbsp;&nbsp;&nbsp;-> vgreduce volume-group-name physical-volume1 2...\
+-> 논리 볼륨 확장\
+&nbsp;&nbsp;&nbsp;&nbsp;-> lvextend [option] logical-volume-path\
+-> 논리 볼륨 축소\
+&nbsp;&nbsp;&nbsp;&nbsp;-> lvreduce [option] logical-volume-path\
+-> 파일시스템 확장 명령어\
+&nbsp;&nbsp;&nbsp;&nbsp;-> xfs_growfs mount-point\
+&nbsp;&nbsp;&nbsp;&nbsp;-> resize2fs logical-volume-path\
+-> 파일시스템 축소 명령어\
+&nbsp;&nbsp;&nbsp;&nbsp;-> resize2fs logical-volume-path size
 
 
 
