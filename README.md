@@ -60,4 +60,58 @@
 
 # 4. 디스크 관리
 -> fdisk file-name : 파티션 구성 디스크 명령어
+
+# 5. 파일시스템 및 스왑 메모리
+-> 파일시스템 : 구조화된 일련의 정보를 구성하는 파일과 디렉토리의 집합, 파일 및 디렉토리를 저장하는 방식\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) mkfs -t [filesystem-type] partition : 파일시스템 생성하는 명령\
+\
+-> 마운트(mount) : 파일시스템을 생성한 후에는 파일시스템이 생성된 파티션 장치에 접근할 수 있도록 경로를 생성해야 한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;파일시스템이 생성된 파티션 장치에서 데이터를 읽거나 쓸 때 일일이 장치 파일을 통해서 접근하는 방식은 매우 불편하다.\
+&nbsp;&nbsp;&nbsp;&nbsp;그렇기 때문에 파일시스템이 생성된 파티션에 디렉토리 형태로 접근할 수 있도록 연결하는 작업을 수행하는데 이를 마운트라고 한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) mount [option] {partition | UUID} mount-point\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) umount [option] {partition | nount-point | UUID}\
+-> blkid : 파일시스템 정보 확인
+
+## 리눅스 파일시스템
+### 디스크 기반 파일시스템(Disk-Based File System)
+-> EXT : 리눅스 초기 개발 시 리눅스에서 사용하기 위하여 만들어진 확장 파일시스템이다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;현재 ext파일시스템은 ext2,ext3,ext4 세가지 버전이 존재한다.\
+-> XFS : RHEL7, CentOS7, OL7 등 최신 리눅스 버전에서 기본 파일시스템으로 사용되고 있는 파일시스템\
+-> FAT : USB등 이동식 저장장치에 주로 사용되고 있는 파일 시스템
+### 분산 파일시스템(Distributed File System)
+-> NFS(Network File System) : 대부분 유닉스/리눅스에서 사용할 수 있는 분산파일시스템 방식.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;공유된 자원을 로컬 시스템의 자원처럼 사용할 수 있다.\
+-> SMB(Server Message Block) : 파일 및 장치 공유 프로토콜인 'SMB'기반의 분산파일시스템이다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;윈도우 운영체제와 유닉스/리눅스 운영체제간 디렉토리 및 파일 공유기능을 제공한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;리눅스에서는 삼바(Samba)서비스를 통해 SMB 공유를 제공할 수 있다.
+### Pseudo 파일 시스템
+-> Pseudo 파일 시스템은 메모리 기반의 파일시스템으로 시스템 성능을 높이고 커널정보에 접근할 수 있도록 지원한다.\
+-> swapfs : 스왑 파일 시스템(Swap file System)은 물리 메모리를 보조하기 위한 디스크 내의 스왑영역에서 사용하는 파일 시스템이다.\
+-> tmpfs : 임시 파일시스템은 디스크 기반의 쓰기 오버헤드를 줄이기 위해 메모리에 파일을 기록하는 시스템\
+-> fdfs : 파일 설명자 파일시스템은 /dev/fd 디렉토리의 파일 설명자를 사용할 수 있는 명시적인 이름을 제공하고 있다.\
+-> procfs : 현재 동작중인 프로세스의 목록을 관리하는 파일시스템\
+-> devfs : 시스템에서 사용하는 모든 디바이스의 이름 공간을 관리하기 위해 사용한다.
+### 주요 파일시스템 구조
+-> 데이터 저장 용도로 주로 사용하는 파일시스템은 EXT 파일시스템 계열의 ext4 파일시스템과 SGI사의 xfs 파일시스템을 주로 사용한다.\
+-> ext4 파일시스템 기본구조\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 파일시스템 전체에 대한 주요 정보는 슈퍼블록에 저장된다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ext4 파일시스템 내에 여러 개의 블록 그룹이 존재한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 슈퍼 블록의 백업이 일부 블록 그룹에 저장된다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> inode를 사용하여 파일의 메타정보와 데이터를 분리하여 저장한다.\
+-> xfs 파일시스템 기본구조\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> inode를 사용한다. 내부 구조는 ext4 파일시스템과 같지 않다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ext4의 블록그룹 대신 할당 그룹 용어를 사용한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 기본적으로 볼륨을 8개의 할당그룹으로 분할한다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 8개 이상으로 분할할 수 있다.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> 파일 탐색을 위해 B+트리를 사용한다.
+### 스왑 메모리
+-> 메모리 확보를 위한 기법\
+-> mkswap file-name : 스왑 파일 생성\
+-> swapon [option] {partition | file-name} : 스왑 영역 활성화\
+-> swapoff [option] {partition | file-name | UUID } : 스왑 영역 활성화 해제
+
+
+
+
+
           
