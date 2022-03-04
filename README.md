@@ -7,26 +7,26 @@
 &nbsp;&nbsp;&nbsp;&nbsp;-> /etc/skel : 뼈대라는 의미로 사용자에 대한 기본적인 초기화 파일들을 저장하고 있는 디렉토리\
 &nbsp;&nbsp;&nbsp;&nbsp;-> /etc/login.defs : 사용자나 그룹을 생성할 때 참고하는 기본 값들이 저장되어 있음\
 &nbsp;&nbsp;&nbsp;&nbsp;-> /etc/sudoers : sudo 명령을 사용하기 위한 조건이 있는 파일\
-&nbsp;&nbsp;&nbsp;&nbsp;-> /var/log/secure : 인증과 관련된 로그를 담는 파일\
+&nbsp;&nbsp;&nbsp;&nbsp;-> /var/log/secure : 인증과 관련된 로그를 담는 파일
 
 ## 사용자 생성관리 명령어
 &nbsp;&nbsp;&nbsp;&nbsp;-> useradd [option] user-name : 사용자 생성\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> useradd -D : 기본 설정 확인\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) useradd -u 2000 -g 10 -m -d /home/guest/user03 -s /bin/sh user03\
 &nbsp;&nbsp;&nbsp;&nbsp;-> usermod [option] user-name : 사용자 정보 수정\
-&nbsp;&nbsp;&nbsp;&nbsp;-> userdel [option] user-name : 사용자 삭제\
+&nbsp;&nbsp;&nbsp;&nbsp;-> userdel [option] user-name : 사용자 삭제
 
 ## 그룹 생성관리 명령어
 &nbsp;&nbsp;&nbsp;&nbsp;-> groupadd [option] group-name : 그룹 생성\
 &nbsp;&nbsp;&nbsp;&nbsp;-> groupmod [option] group-name : 그룹 정보 수정\
-&nbsp;&nbsp;&nbsp;&nbsp;-> groupdel group-name : 그룹 삭제\
+&nbsp;&nbsp;&nbsp;&nbsp;-> groupdel group-name : 그룹 삭제
 
 ## 기타 권한 명령어
 &nbsp;&nbsp;&nbsp;&nbsp;-> su [-] [user-name] : 사용자 전환\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) sudo -i : 루트 사용자 전환\
 &nbsp;&nbsp;&nbsp;&nbsp;-> sudo [option] [user-name] command : 로그아웃을 하지않고 특정 사용자 권한으로 수행\
 &nbsp;&nbsp;&nbsp;&nbsp;-> chage [option] [argument] user-name :  /etc/shadow 파일에서 패스워드의 속성을 변경하는 명령어
-\
+
 # 2. 고급 권한 관리
 -> 개념 : 대부분의 경우, 읽기, 쓰기, 실행과 같은 기본 권한을 설정하여 파일에 대한 접근을 제어할 수 있지만,\
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -52,5 +52,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;-> setfacl [option] ENTRY:NAME:PERMS file-name : 접근 제어 리스트 설정\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -m u:user01:rwx /root/acl/dirA\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -x g:group01 /root/acl/dirA #권한제거\
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -RM u:user01:rwx /root/acl/dirA #재귀적 사용\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -RM u:user01:rwx /root/acl/dirA #재귀적 사용
+
+# 작업 스케줄링
+-> at [option] time-spec : 단일성 작업 예약\
+-> crontab -e : 주기적인 작업 예약
+
+# 디스크 관리
+-> fdisk file-name : 파티션 구성 디스크 명령어
           
