@@ -54,10 +54,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -x g:group01 /root/acl/dirA #권한제거\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> ex) setfacl -RM u:user01:rwx /root/acl/dirA #재귀적 사용
 
-# 작업 스케줄링
+## 작업 스케줄링
 -> at [option] time-spec : 단일성 작업 예약\
 -> crontab -e : 주기적인 작업 예약
 
-# 디스크 관리
+## 디스크 관리
 -> fdisk file-name : 파티션 구성 디스크 명령어
           
