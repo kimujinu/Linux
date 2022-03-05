@@ -401,7 +401,44 @@
 -> 수동시간 설정
     -> 네트워크를 통해 NTP 서버에서 시간정보를 수신할 수 없는 경우, 또는 사용자가 임의로 시간을 변경하고 싶을 경우 date나 timedatectl를 사용
 </pre>
+# 13. 방화벽 관리
+<pre>
+-> 개요 : 리눅스 방화벽은 외부의 네트워크에서 내부의 시스템으로 접근하는 네트워크 패킷을 차단하는 서비스이다.
+          리눅스에서 제공하는 방화벽은 Netfilter에 의해서 적용된다.
+          Netfilter는 시스템에 접근하는 네트워크 패킷을 시스템 내부로 전달할지 아니면 폐기할지 결정하는 커널 모듈이다.
+          사용자들이 Netfilter를 사용하여 네트워크 접근을 직접 제어하지 않고 서비스 관리 도구를 이용하여 제어한다.
 
+-> firewalld
+    -> firewalld는 systemd와 함께 도입된 방화벽 서비스이다.
+       기존의 iptables의 한계와 단점을 보완한느 방화벽 서비스이다.
+       iptables는 룰을 변경할 때 서비스를 중지해야 하기 때문에 네트워크 변화가 수시로 발생되는 오픈스택이나 가상화에서 사용할 때 제한적이다.
+       하지만 firewalld는 동적으로 방화벽 설정을 변경할 수 있기 때문에 수시로 변하는 네트워크 변화에 대해 제한 없이 대응 할 수 있다는 장점이 존재한다.
+    -> /usr/lib/firewalld , /etc/firewalld : firewalld 서비스 설정 관련 파일, 기본 구성 대비용 적용되는 설정 파일
+    -> 동작 원리
+        -> firewalld에서는 사전에 정의된 영역이 제공된다. 
+           하지만 이 영역이 모두 사용되는 것은 아니고, 실제로는 활성화된 영역(Active Zone)만 사용된다.
+           /etc/firewalld 디렉토리 내에 영역의 이름으로 된 XML파일이 존재하면 해당 영역은 활성화 영역이다.
+           활성화 영역의 조건은 두가지 이다.
+           -> 출발지의 주소(Source Address) 규칙 존재
+           -> 연결되어 있는 인터페이스(Interface) 존재
+    -> 관련 명령어
+        -> 상태 및 정보 확인 옵션
+            -> firewall-cmd --state : firewalld 실행 상태 확인
+            -> firewall-cmd --get-zones :  사전에 정의된 영역 확인
+            -> firewall-cmd --get-services : 사전에 정의된 서비스 확인
+            -> firewall-cmd --get-active-zones : 활성화된 영역 확인
+            -> firewall-cmd --get-default-zone : 기본 영역 확인
+            -> firewall-cmd --list-all --zone=home : 설정된 규칙 확인
+        -> 규칙 설정 옵션
+            -> firewall-cmd --set-default-zone=home : 기본 영역 설정
+            -> firewall-cmd --add-interface=ens37 --zone=hone : 특정 영역에 인터페이스 연결 추가
+            -> firewall-cmd --change-interface=ens37 --zone=hone : 영역에 연결된 인터페이스 변경
+            -> firewall-cmd --add-source=192.168.0.0/24 --zone=public --permanent : 출발지 주소 규칙 추가
+            -> firewall-cmd --remove-source=192.168.0.0/24 : 출발지 주소 규칙 제거
+    -> 리치 규칙(Rich Rule)
+        -> firewall-cmd에서 제공하는 명령으로 대부분의 규칙 설정을 할 수 있지만 세부적인 설정을 수정하는 기능이 부족하다.
+           firewalld에서 방화벽 규칙을 세부적으로 설정할 때 사용되는 것.
+</pre>
 
 
           
