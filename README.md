@@ -285,8 +285,85 @@
 </pre>
 
 # 11. 네트워크 
+## 네트워크 관리
 <pre>
+-> ip address show [interface-name] : IP 정보 확인
+   ifconfig [interface-name] 
+-> ip route : 라우팅 테이블 확인
+-> traceroute [option] destination : 목적지까지 가는 라우터 경로를 출력하는 명령어
+-> nslookup [interface-name]: Domain의 IP를 조회하는 명령어
+</pre>
 
+## 네트워크 관리자
+<pre>
+-> 네트워크 관리자는 네트워크와 관련된 모든 설정을 관리하고 모니터링 하는 서비스이다.
+   서비스 이름은 NetworkManager이며, systemd에서는 systemctl로 제어한다.
+-> yum -y install NetworkManager : 네트워크 관리자 설치
+   systemctl status NetworkManager : 네트워크 관리자를 설치한 뒤 서비스 확인
+
+-> 레거시(Legacy) 네트워크 구성
+    -> 기존 방식을 통한 네트워크 서비스 구성
+    -> /etc/sysconfig/network-scripts : 설정 파일
+    -> 레거시 네트워크 사용
+        -> 기존 레거시 네트워크 사용을 하고싶다면 네트워크 관리를 중지 및 비활성화 해야함.
+        -> systemctl stop NetworkManager 
+        -> systemctl disable NetworkManager
+        -> systemctl mask NetworkManager
+        -> systemctl start network
+        -> systemctl enable network
+    -> 레거시 네트워크 설정
+        -> /etc/sysconfig/network-scripts : ifcfg 파일 수정
+    -> systemctl restart network : 변경후, 재시작
+    -> ip address add ip/netmask dev interface-name : ip 명령을 사용하여 인터페이스에 IP 추가
+
+-> 네트워크 관리자 도구 활용
+    -> nmcli(Network Manager Command Line Interface)
+        -> 네트워크 관리자가 제공하는 가장 강력한 커맨드 라인 도구
+    -> nmcli connection show : 네트워크 연결 목록 확인
+    -> nmcli connection add [subcommand1] [arg1] : 연결 생성
+    -> nmcli connection delete connection-name : 연결설정 삭제
+    -> nmcli connection modify connection-name subcommand arg : 연결 수정
+    -> nmcli connection {up|down} connection-name : 설정 활성화/비활성화
+</pre>
+
+## 호스트이름 설정
+<pre>
+-> 개요 : 사용자는 다른 시스템과 통신하려면 대상 시스템의 IP주소를 알고 있어야 하지만, IP를 외우는 것은 매우 어렵다.
+          따라서 주소로 변환하는 방식 DNS(Domain Name System) 서비스를 사용한다.
+-> hostname : 시스템의 호스트이름을 확인
+-> hostnamectl : 호스트이름의 정보를 확인
+-> hostnamectl set-hostname hostname : 호스트이름 변경
+</pre>
+
+## OpenSSH(Open Secure Shell)
+<pre>
+-> 개요 :  관리자가 시스템을 관리할 때 직접 서버에서 접속하는 방식과 외부에서 네트워크를 통해 접속하는 방식이 있다.
+           직접 서버에서 작업하는 경우는 서버의 모니터와 키보드를 직접 연결하여 사용하는 방식과 콘솔 연결방식으로 나누어진다.
+           외부에서 네트워크를 통해 원격 접속할 때 사용하는 방식은 과거에는 텔넷(Telnet)이나 리모트쉘(rsh)을 사용했으며,
+           근래에는 보안쉘(SSH)을 이용한 방식을 주로 사용하고 있다.
+           SSH는 데이터 암호화할 때 비대칭 키 암호화와 대칭키 암호화 알고리즘을 사용한다.
+-> ex) ssh user01@example.co.kr : example.co.kr 시스템의 user01로 원격 접속하는 예시
+
+-> 연결과정
+    -> 클라이언트는 서버에게 접속 요청
+    -> 서버는 클라이언트에게 공개 키 전송
+    -> 클라이어트는 비밀 키 생성
+    -> 클라이언트는 비밀 키 암호화
+    -> 클라이언트는 서버에 비밀 키 전송
+    -> 서버는 비밀 키 복호화
+
+-> /etc/ssh : OpenSSH의 구성 파일 위치
+-> /etc/ssh/sshd_config : OpenSSH 서버 설정파일
+
+-> OpenSSH 키 기반 인증
+    -> 개요 : 원격접속 할 땐 기본적으로 사용자의 아이디나 패스워드를 알아야한다.
+              하지만 키 기반 인증은 암호를 알고있지 않아도 접속이 가능하다.
+    -> 키 파일 생성 : ssh-keygen [option] [arg] 
+    -> 키 파일 복사 : ssh-copy-id [option] [arg] [user-name]@address 
+
+-> 원격 파일 전송
+    -> scp [option] source1 source2 ..dstination : scp(Secure Copy) 명어 사용, rcp를 대체하기 위한 명령어 rcp는 평문전송 이기때문에 대체하였다.
+    -> sftp [user-name]@address : sftp 명령 사용
 </pre>
 
 
