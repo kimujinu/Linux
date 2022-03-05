@@ -366,6 +366,41 @@
     -> sftp [user-name]@address : sftp 명령 사용
 </pre>
 
+# 12. NTP(Network Time Protocol) 서버 관리
+<pre>
+-> 개요 : NTP는 컴퓨터의 시스템의 시간을 동기화할 때 사용하는 프로토콜이다.
+
+-> NTP 동작 방식
+    -> 시간정보를 동기화시키고자 하는 클라이언트 NTP 서버로 정확한 시간정보 요청을 전송한다.
+       이 때, 자신이 가지고 있는 정확하지 않은 시간 정보를 함께 전송한다.
+    -> NTP 서버는 요청을 수신 후 응답을 준비한다.
+    -> NTP 서버는 요청을 전송받은 정확한 시간정보와, 요청 수신 후 응답하는 정확한 시간정보를 포함한 정보를 응답한다.
+
+-> NTP 계층 구조
+    -> NTP 서버의 특징
+        -> Stratum0 : 가장 상위 계층, Stratum 1에게 정확한 시간정보를 제공
+        -> Stratum1 : Stratum0으로 부터 시간정보 수신 및 동기화, 일반적으로 Stratum2 서버 이외의 접근을 차단한다.
+        -> Stratum2 : 일반적인 시간동기화 요청에 사용할 수 있는 최상위 NTP 서버
+        -> Stratum n : 각각 자신보다 상위 단계의 서버로부터 시간을 동기화한다.
+                       계층이 낮아질수록 시간정확도가 낮을 가능성이 높다.
+
+-> chrony 서비스
+    -> 이전 버전의 리눅스는 NTP서비스를 사용하기 위해 NTP 도구를 상요하여 시간동기화를 수행하였으나,
+       최신 리눅스에서 chrony로 교체되었다.
+    -> /etc/chrony.conf : chronyd 서비스는 파일을 참조하여 동작환경을 설정한다.
+    -> chronyc tracking : 동기화 시간정보 확인
+    -> chronyc sources : 시간 소스 정보 확인
+    -> chronyc sourcestats : drift rate 및 offset 추정 정보 확인
+    -> ex) 설정변경
+        -> chronyc
+        -> add server ntp.ewha.or.kr
+        -> authhash SHA1
+    -> vi /etc/chronyc.conf : vi를 사용하여 영구 설정 변경
+        -> systemctl restart chronyd : 서비스 재시작
+
+-> 수동시간 설정
+    -> 네트워크를 통해 NTP 서버에서 시간정보를 수신할 수 없는 경우, 또는 사용자가 임의로 시간을 변경하고 싶을 경우 date나 timedatectl를 사용
+</pre>
 
 
 
