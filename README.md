@@ -383,20 +383,22 @@
         -> Stratum2 : 일반적인 시간동기화 요청에 사용할 수 있는 최상위 NTP 서버
         -> Stratum n : 각각 자신보다 상위 단계의 서버로부터 시간을 동기화한다.
                        계층이 낮아질수록 시간정확도가 낮을 가능성이 높다.
+</pre>
 
--> chrony 서비스
-    -> 이전 버전의 리눅스는 NTP서비스를 사용하기 위해 NTP 도구를 상요하여 시간동기화를 수행하였으나,
-       최신 리눅스에서 chrony로 교체되었다.
-    -> /etc/chrony.conf : chronyd 서비스는 파일을 참조하여 동작환경을 설정한다.
-    -> chronyc tracking : 동기화 시간정보 확인
-    -> chronyc sources : 시간 소스 정보 확인
-    -> chronyc sourcestats : drift rate 및 offset 추정 정보 확인
-    -> ex) 설정변경
-        -> chronyc
-        -> add server ntp.ewha.or.kr
-        -> authhash SHA1
-    -> vi /etc/chronyc.conf : vi를 사용하여 영구 설정 변경
-        -> systemctl restart chronyd : 서비스 재시작
+## chrony 서비스
+<pre>
+-> 이전 버전의 리눅스는 NTP서비스를 사용하기 위해 NTP 도구를 상요하여 시간동기화를 수행하였으나,
+   최신 리눅스에서 chrony로 교체되었다.
+-> /etc/chrony.conf : chronyd 서비스는 파일을 참조하여 동작환경을 설정한다.
+-> chronyc tracking : 동기화 시간정보 확인
+-> chronyc sources : 시간 소스 정보 확인
+-> chronyc sourcestats : drift rate 및 offset 추정 정보 확인
+-> ex) 설정변경
+   -> chronyc
+   -> add server ntp.ewha.or.kr
+   -> authhash SHA1
+   -> vi /etc/chronyc.conf : vi를 사용하여 영구 설정 변경
+     -> systemctl restart chronyd : 서비스 재시작
 
 -> 수동시간 설정
     -> 네트워크를 통해 NTP 서버에서 시간정보를 수신할 수 없는 경우, 또는 사용자가 임의로 시간을 변경하고 싶을 경우 date나 timedatectl를 사용
@@ -407,38 +409,104 @@
           리눅스에서 제공하는 방화벽은 Netfilter에 의해서 적용된다.
           Netfilter는 시스템에 접근하는 네트워크 패킷을 시스템 내부로 전달할지 아니면 폐기할지 결정하는 커널 모듈이다.
           사용자들이 Netfilter를 사용하여 네트워크 접근을 직접 제어하지 않고 서비스 관리 도구를 이용하여 제어한다.
-
--> firewalld
-    -> firewalld는 systemd와 함께 도입된 방화벽 서비스이다.
-       기존의 iptables의 한계와 단점을 보완한느 방화벽 서비스이다.
-       iptables는 룰을 변경할 때 서비스를 중지해야 하기 때문에 네트워크 변화가 수시로 발생되는 오픈스택이나 가상화에서 사용할 때 제한적이다.
-       하지만 firewalld는 동적으로 방화벽 설정을 변경할 수 있기 때문에 수시로 변하는 네트워크 변화에 대해 제한 없이 대응 할 수 있다는 장점이 존재한다.
-    -> /usr/lib/firewalld , /etc/firewalld : firewalld 서비스 설정 관련 파일, 기본 구성 대비용 적용되는 설정 파일
-    -> 동작 원리
-        -> firewalld에서는 사전에 정의된 영역이 제공된다. 
-           하지만 이 영역이 모두 사용되는 것은 아니고, 실제로는 활성화된 영역(Active Zone)만 사용된다.
-           /etc/firewalld 디렉토리 내에 영역의 이름으로 된 XML파일이 존재하면 해당 영역은 활성화 영역이다.
-           활성화 영역의 조건은 두가지 이다.
-           -> 출발지의 주소(Source Address) 규칙 존재
-           -> 연결되어 있는 인터페이스(Interface) 존재
-    -> 관련 명령어
-        -> 상태 및 정보 확인 옵션
-            -> firewall-cmd --state : firewalld 실행 상태 확인
-            -> firewall-cmd --get-zones :  사전에 정의된 영역 확인
-            -> firewall-cmd --get-services : 사전에 정의된 서비스 확인
-            -> firewall-cmd --get-active-zones : 활성화된 영역 확인
-            -> firewall-cmd --get-default-zone : 기본 영역 확인
-            -> firewall-cmd --list-all --zone=home : 설정된 규칙 확인
-        -> 규칙 설정 옵션
-            -> firewall-cmd --set-default-zone=home : 기본 영역 설정
-            -> firewall-cmd --add-interface=ens37 --zone=hone : 특정 영역에 인터페이스 연결 추가
-            -> firewall-cmd --change-interface=ens37 --zone=hone : 영역에 연결된 인터페이스 변경
-            -> firewall-cmd --add-source=192.168.0.0/24 --zone=public --permanent : 출발지 주소 규칙 추가
-            -> firewall-cmd --remove-source=192.168.0.0/24 : 출발지 주소 규칙 제거
-    -> 리치 규칙(Rich Rule)
-        -> firewall-cmd에서 제공하는 명령으로 대부분의 규칙 설정을 할 수 있지만 세부적인 설정을 수정하는 기능이 부족하다.
-           firewalld에서 방화벽 규칙을 세부적으로 설정할 때 사용되는 것.
+</pre>
+## firewalld
+<pre>
+-> firewalld는 systemd와 함께 도입된 방화벽 서비스이다.
+   기존의 iptables의 한계와 단점을 보완한느 방화벽 서비스이다.
+   iptables는 룰을 변경할 때 서비스를 중지해야 하기 때문에 네트워크 변화가 수시로 발생되는 오픈스택이나 가상화에서 사용할 때 제한적이다.
+   하지만 firewalld는 동적으로 방화벽 설정을 변경할 수 있기 때문에 수시로 변하는 네트워크 변화에 대해 제한 없이 대응 할 수 있다는 장점이 존재한다.
+-> /usr/lib/firewalld , /etc/firewalld : firewalld 서비스 설정 관련 파일, 기본 구성 대비용 적용되는 설정 파일
+-> 동작 원리
+    -> firewalld에서는 사전에 정의된 영역이 제공된다. 
+       하지만 이 영역이 모두 사용되는 것은 아니고, 실제로는 활성화된 영역(Active Zone)만 사용된다.
+       /etc/firewalld 디렉토리 내에 영역의 이름으로 된 XML파일이 존재하면 해당 영역은 활성화 영역이다.
+       활성화 영역의 조건은 두가지 이다.
+       -> 출발지의 주소(Source Address) 규칙 존재
+       -> 연결되어 있는 인터페이스(Interface) 존재
+-> 관련 명령어
+    -> 상태 및 정보 확인 옵션
+        -> firewall-cmd --state : firewalld 실행 상태 확인
+        -> firewall-cmd --get-zones :  사전에 정의된 영역 확인
+        -> firewall-cmd --get-services : 사전에 정의된 서비스 확인
+        -> firewall-cmd --get-active-zones : 활성화된 영역 확인
+        -> firewall-cmd --get-default-zone : 기본 영역 확인
+        -> firewall-cmd --list-all --zone=home : 설정된 규칙 확인
+    -> 규칙 설정 옵션
+        -> firewall-cmd --set-default-zone=home : 기본 영역 설정
+        -> firewall-cmd --add-interface=ens37 --zone=hone : 특정 영역에 인터페이스 연결 추가
+        -> firewall-cmd --change-interface=ens37 --zone=hone : 영역에 연결된 인터페이스 변경
+        -> firewall-cmd --add-source=192.168.0.0/24 --zone=public --permanent : 출발지 주소 규칙 추가
+        -> firewall-cmd --remove-source=192.168.0.0/24 : 출발지 주소 규칙 제거
+-> 리치 규칙(Rich Rule)
+    -> firewall-cmd에서 제공하는 명령으로 대부분의 규칙 설정을 할 수 있지만 세부적인 설정을 수정하는 기능이 부족하다.
+       firewalld에서 방화벽 규칙을 세부적으로 설정할 때 사용되는 것.
 </pre>
 
+# 14. 네트워크 티밍
+<pre>
+-> 개요 : 일반적인 네트워크 구성은 하나의 인터페이스에 하나의 IP주소를 설정하는 것이다.
+          하지만, 티밍 구성은 여러 개의 물리 인터페이스를 묶어 하나의 논리 인터페이스를 구성하고 이 논리 인터페이스에 IP주소를 부여하는 방식이다.
+          이러한 티밍 구성을 하는 이유는 대역폭을 늘려 데이터 처리량을 높여주거나, 부하분산을 통해 효율성을 높이고,
+          트래픽 처리 속도를 향상시킬 수 있고, 네트워크 인터페이스에 장애 발생 시 좀 더 안전한 네트워크 구성을 위해 설정한다.
+       
+-> 네트워크 티밍 구성 방식:
+    -> 포트 트렁킹(Port Trunking)
+    -> 링크 집계(Link Aggregation)
+    -> 채널 본딩(Channel Bonding)
+    -> 이더넷 본딩(Ethernet Bonding)
+    -> 채널 티밍(Channel Teaming)
+    -> NIC 티밍(NIC Teaming)
+
+-> 부가설명 : 리눅스에서는 예전부터 이런 구성을 본딩(Bonding) 이라고 하였으며,
+             최신 엔터프라이즈 리눅스에서는 기존의 본딩 방식과는 별개로 티밍 방식을 제공한다. 
+             물론 여전히 기존 본딩 방식으로 네트워크를 구성할 수 있다.
+             네트워크 티밍의 장점은 새롭게 설계된 커널 모듈로서 팀 인터페이스로 유입되는 트래픽을 더 빠르게 처리하거나,
+             LACP(Link Aggregation Control Protocol)를 완벽하게 지원하며, IPv6 링크 모니터링 및 D-Bus 인터페이스까지 지원한다.
+             또한 본딩의 동작은 커널 영역에서 이뤄지지만, 티밍은 사용자 영역에서 동작하기 때문에 쉽게 관리하고 운영이 가능하다.
+</pre>
+
+## 티밍(teaming)
+<pre>
+-> 여러 개의 물리적인 인터페이스를 하나의 논리적인 인터페이스로 구성하는 네트워크 구성 방식이다.
+-> 여기에서 사용되는 물리적인 인터페이스를 티밍에서는 슬레이브 혹은 포트 인터페이스라고 부르고, 
+   해당 인터페이스들의 묶음인 논리적인 인터페이스를 마스터 혹은 팀 인터페이스라고 한다.
+-> 이러한 물리적인 인터페이스인 포트 인터페이스는 실질적으로 데이터가 이동하는 통로 역할을 수행하게 되며,
+   가상의 인터페이스인 팀 인터페이스에는 데이터의 처리 방식과 통신에 사용할 IP주소와 같은 논리적인 구성이 포함되는 인터페이스이다.
+-> 티밍이 활성화되려면 팀 인터페이스에 연결된 포트 인터페이스들이 활성화되어야 한다.
+-> 티밍은 팀 인터페이스에 IP주소를 부여할 수  있는데 이 때 IP주소를 DHCP서버에서 동적으로 할당 받을 수 도 있고, 정적 설정도 가능하다.
+-> 만약 동적으로 IP 주소로 할당받으려면 포트 인터페이스는 반드시 네트워크에 연결되어 있어야 한다.
+   정적 IP 설정은 포트 인터페이스가 연결되기 전에 설정할 수 있지만 동작하지 않는다.
+</pre>
+## 러너(Runner)
+<pre>
+-> 티밍은 설정에 따라 트래픽 처리 방식이 달라지는데 여기에서 처리 방식을 결정해주는 것이 러너이다.
+-> 러너는 그 설정에 따라 데이터 처리량을 높여주거나, 효율성을 높이고 처리 속도를 향상시킬 수도 있고,
+   네트워크 연결에 장애가 발생했을 때 끊어짐 없이 안정적인 서비스를 제공할 수 있도록 네트워크를 구성할 수 있다.
+-> 처리방식
+    -> broadcast : 모든 포트로 데이터 전송
+    -> roundRobin : 각 포트로 순차적 데이터 전송
+    -> loadbalance : 부하분산 방식의 패킷 전송
+    -> activebackup : 장애조치를 위한 설정
+    -> lacp : LACP 구현 스위치 기능상의 지원이 필요
+</pre>
+## 티밍(teaming)과 본딩(Bonding)
+<pre>
+-> 공통점 : 모두 대역폭의 확장이나 부하분산, 장애조치와 같은 목적을 위해 
+           여러 개의 물리적인 네트워크를 묶어 하나의 논리적인 네트워크 인터페이스를 구성한다.
+-> 차이점 : 본딩(Bonding)은 동작 레벨이 커널 레벨(Kernel level)에서의 드라이버 제어였다면
+            티밍(teaming)은 사용자 레벨(User level)에서의 동작 제어와 설정을 제공하기 때문에
+            기존의 드라이버에 영향을 미치지 않는 새로운 방식이다.
+            티밍은 사용자 레벨에서 동작하면서 Team Netlink API라는 도구를 통해 드라이버를 관리한다.
+-> 요약
+    -> 티밍을 사용하면 기존에 본딩으로 구성할 때보다 훨씬 편리하고 유연하게 설정할 수 있다.
+       또한 모듈 방식으로 제공하기 때문에 확장성이 좋고 성능 면에서도 더 나은 성능을 기대할 수 있다.
+    -> 티밍의 장점
+        -> 유저 레벨의 동작으로 유연성 및 패킷 처리량이 향상
+        -> 사용자가 해시함수를 지정할 수 있다.
+        -> IPv6에 대한 모니터링이 가능해졌다.
+        -> 포트간의 우선순위를 지정할 수 있다.
+        -> 오버헤드가 낮아져 성능이 향상되었다.
+</pre>
 
           
